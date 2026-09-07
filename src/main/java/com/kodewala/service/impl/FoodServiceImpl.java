@@ -1,5 +1,9 @@
 package com.kodewala.service.impl;
 
+import com.kodewala.entity.FoodEntity;
+import com.kodewala.io.FoodRequest;
+import com.kodewala.io.FoodResponse;
+import com.kodewala.repository.FoodRepository;
 import com.kodewala.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +23,9 @@ import java.util.UUID;
 public class FoodServiceImpl implements FoodService {
     @Autowired
     S3Client s3Client;
+
+    @Autowired
+    FoodRepository foodRepository;
 
     @Value("${aws.s3.bucketname}")
     private String bucketName;
@@ -47,6 +54,36 @@ public class FoodServiceImpl implements FoodService {
        }catch(IOException ex){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"An error occured while uploading the file");
        }
-        return "";
+
+    }
+
+    @Override
+    public FoodResponse addFood(FoodRequest request, MultipartFile file) {
+        FoodEntity newFoodEntity=convertToEntity(request);
+        String imageUrl=uploadFile(file);
+        newFoodEntity.setImageUrl(imageUrl);
+        newFoodEntity=foodRepository.save(newFoodEntity);
+        return convertToResponse(newFoodEntity);
+
+    }
+
+    private FoodEntity convertToEntity(FoodRequest request){
+        return FoodEntity.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .category(request.getCategory())
+                .price(request.getPrice())
+                .build();
+    }
+
+    private FoodResponse convertToResponse(FoodEntity entity){
+       return FoodResponse.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .category(entity.getCategory())
+                .price(entity.getPrice())
+                .imageUrl(entity.getImageUrl())
+                .build();
     }
 }
