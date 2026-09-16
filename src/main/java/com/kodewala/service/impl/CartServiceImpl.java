@@ -43,6 +43,13 @@ public class CartServiceImpl implements CartService {
         return convertToResponse(entity);
     }
 
+    @Override
+    public void clearCart() {
+        String loggedInUserId=userService.findByUserId();
+        cartRepository.deleteByUserId(loggedInUserId);
+
+    }
+
     private CartResponse convertToResponse(CartEntity cartEntity){
        return CartResponse.builder()
                 .id(cartEntity.getId())

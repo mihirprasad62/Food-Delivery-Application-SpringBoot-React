@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface CartRepository extends MongoRepository<CartEntity,String> {
     Optional<CartEntity> findByUserId(String userId);
 
-    CartResponse deleteByUserId(CartRequest request);
+    long deleteByUserId(String userId);
 }
