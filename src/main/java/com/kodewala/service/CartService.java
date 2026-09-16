@@ -6,4 +6,6 @@ import com.kodewala.io.CartResponse;
 public interface CartService {
 
     CartResponse addToCart(CartRequest request);
+
+    CartResponse getCart();
 }
